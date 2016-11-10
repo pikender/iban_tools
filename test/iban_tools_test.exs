@@ -3,23 +3,23 @@ defmodule IbanToolsTest do
   doctest IbanTools
 
 	test "should validate IBAN code" do
-    assert basic_check("ES8901820507910202155087") == "Valid"
+    assert IbanTools.basic_check("ES8901820507910202155087") == "Valid"
 	end
 
 	test "should reject IBAN code wtesth invalid characters" do
-    assert basic_check("gb99 %BC") == "Invalid Chars"
+    assert IbanTools.basic_check("gb99 %BC") == "Invalid Chars"
   end
 
 	test "should reject IBAN code from unknown country" do
-    assert basic_check("NO9386011117947") == "Unknown Country"
+    assert IbanTools.basic_check("NO9386011117947") == "Unknown Country"
   end
 
 	test "should reject IBAN code that does not match the length for the respective country" do
-    assert basic_check("ES890182050791020215508") == "Length Mismatch"
+    assert IbanTools.basic_check("ES890182050791020215508") == "Length Mismatch"
   end
 
 	test "should reject IBAN code that does not match the pattern for the selected country" do
-    assert basic_check("ES89AB820507910202155087") == "Format mismatch"
+    assert IbanTools.basic_check("ES89AB820507910202155087") == "Format mismatch"
   end
 
 	test "should reject IBAN code wtesth invalid check digtests"
@@ -27,23 +27,23 @@ defmodule IbanToolsTest do
 	test "should numerify IBAN code"
 
 	test "should canonicalize IBAN code" do
-    assert canonicalize_code("  gb82 WeSt 1234 5698 7654 32") == "GB82WEST12345698765432"
+    assert IbanTools.canonicalize_code("  gb82 WeSt 1234 5698 7654 32") == "GB82WEST12345698765432"
   end
 
 	test "should pretty-print IBAN code" do
-    assert pretty_print(" GB82W EST12 34 5698 765432  ") == "GB82 WEST 1234 5698 7654 32"
+    assert IbanTools.pretty_print(" GB82W EST12 34 5698 765432  ") == "GB82 WEST 1234 5698 7654 32"
   end
 
 	test "should extract ISO country code" do
-    assert country_code("ES8901820507910202155087") == "ES"
+    assert IbanTools.country_code("ES8901820507910202155087") == "ES"
   end
 
 	test "should extract check digits" do
-    assert check_digits("ES8901820507910202155087") == "89"
+    assert IbanTools.check_digits("ES8901820507910202155087") == "89"
   end
 
 	test "should extract BBAN (Basic Bank Account Number)" do
-    assert bban("ES8901820507910202155087") == "01820507910202155087"
+    assert IbanTools.bban("ES8901820507910202155087") == "01820507910202155087"
   end
 
 	test "should be valid" do
@@ -118,60 +118,11 @@ defmodule IbanToolsTest do
 			"XK051212012345678906"
 		],
     fn(code) ->
-      assert basic_check(code) == "Valid"
+      assert IbanTools.basic_check(code) == "Valid"
     end)
   end
 
 	test "should fail known pattern violations" do
-    assert basic_check("RO7999991B31007593840000") == "Valid"
+    assert IbanTools.basic_check("RO7999991B31007593840000") == "Valid"
   end
-
-  def canonicalize_code(code) do
-    code
-      |> String.trim
-      |> String.replace(~r/\s+/, "")
-      |> String.upcase
-  end
-
-  def pretty_print(code) do
-    code
-      |> canonicalize_code
-      |> String.trim
-      |> String.replace(~r/(.{4})/, "\\1 ")
-  end
-
-  def country_code(<<country_code::bytes-size(2)>> <> rest) do
-    country_code
-  end
-  def check_digits(<<_::bytes-size(2)>> <> <<check_digits::bytes-size(2)>> <> rest) do
-    check_digits
-  end
-  def bban(<<_::bytes-size(2)>> <> <<_::bytes-size(2)>> <> bban) do
-    bban
-  end
-
-  def basic_check(code) do
-    case String.length(code) < 5 do
-      true -> "Check Failed"
-      _ -> check_bad_chars(code)
-    end
-  end
-  def check_bad_chars(code) do
-    case Regex.match?(~r/^[A-Z0-9]+$/, code) do
-      false -> "Invalid Chars"
-      _ -> country_rules_check(code)
-    end
-  end
-  def country_rules_check(("ES" <> <<dg::bytes-size(2)>> <> rest) = code) do
-    if String.length(code) == 24 do
-      if Regex.match?(~r/^\d{8}[A-Z0-9]{12}$/, rest) do
-        "Valid"
-      else
-        "Format mismatch"
-      end
-    else
-      "Length Mismatch"
-    end
-  end
-  def country_rules_check(_), do: "Unknown Country"
 end
