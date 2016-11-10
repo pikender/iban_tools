@@ -25,6 +25,10 @@ defmodule IbanTools do
     bban
   end
 
+  # TODO:
+  ## Check `with` syntax
+  ## Add more country clauses from YAML write
+  ## Better Errors Mgmt
   def basic_check(code) do
     case String.length(code) < 5 do
       true -> "Check Failed"
