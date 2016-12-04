@@ -67,17 +67,26 @@ defmodule IbanTools do
     }
   end
 
-  def country_rules("ES"), do: {:ok, %{country_code: "ES", len: 24, bban_pattern: ~r/^\d{20}$/}}
-  def country_rules("GB"), do: {:ok, %{country_code: "GB", len: 22, bban_pattern: ~r/^[A-Z]{4}\d{14}$/}}
+  @external_resource country_rules_path = Path.join([__DIR__, "rules.txt"])
+
+  for line <- File.stream!(country_rules_path, [], :line) do
+    [country_code, code_len, bban_format] = line |> String.split(",") |> Enum.map(&String.strip(&1))
+
+    code_len = String.to_integer(code_len)
+    {:ok, bban_pattern} = Regex.compile(bban_format)
+
+    def country_rules(unquote(country_code)), do: {:ok, %{country_code: unquote(country_code), len: unquote(code_len), bban_pattern: ~r/^#{unquote(bban_pattern.source)}$/}}
+  end
+
   def country_rules(_), do: {:error, :unknown_country_code}
 
   def check_with(iban_info) do
     with {:ok, iban_country_info} <- country_rules(iban_info.country_code),
       :ok <- check_min_length(iban_info.len),
       :ok <- check_bad_characters(iban_info.code),
-      :ok <- IbanTools.Numerify.check_valid_check_digits(iban_info),
       :ok <- check_country_code_length(iban_info.len, iban_country_info.len),
-      :ok <- check_country_bban_format(iban_info.bban, iban_country_info.bban_pattern) do
+      :ok <- check_country_bban_format(iban_info.bban, iban_country_info.bban_pattern),
+      :ok <- IbanTools.Numerify.check_valid_check_digits(iban_info) do
         {:ok, :valid}
     else
       {:error, reason} ->
@@ -100,7 +109,7 @@ defmodule IbanTools do
 
   @missing_message_key "Please create an issue and report"
 
-  def valid?(code) do
+  def valid(code) do
     iban_info = iban_values(code)
     {status, message_code} = check_with(iban_info)
     {status, message_code, Map.get(@messages, message_code, @missing_message_key)}
