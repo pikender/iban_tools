@@ -80,9 +80,10 @@ defmodule IbanTools do
 
   def country_rules(_), do: {:error, :unknown_country_code}
 
-  def check_with(iban_info) do
-    with {:ok, iban_country_info} <- country_rules(iban_info.country_code),
-      :ok <- check_min_length(iban_info.len),
+  def check_with(code) do
+    with :ok <- check_min_length(String.length(code)),
+      iban_info <- iban_values(code),
+      {:ok, iban_country_info} <- country_rules(iban_info.country_code),
       :ok <- check_bad_characters(iban_info.code),
       :ok <- check_country_code_length(iban_info.len, iban_country_info.len),
       :ok <- check_country_bban_format(iban_info.bban, iban_country_info.bban_pattern),
@@ -110,8 +111,7 @@ defmodule IbanTools do
   @missing_message_key "Please create an issue and report"
 
   def valid(code) do
-    iban_info = iban_values(code)
-    {status, message_code} = check_with(iban_info)
+    {status, message_code} = check_with(code)
     {status, message_code, Map.get(@messages, message_code, @missing_message_key)}
   end
 end

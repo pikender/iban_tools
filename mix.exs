@@ -4,12 +4,13 @@ defmodule IbanTools.Mixfile do
   def project do
     [app: :iban_tools,
      version: "0.1.0",
+     description: description(),
+     package: package(),
      elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps()]
   end
-
   # Configuration for the OTP application
   #
   # Type "mix help compile.app" for more information
@@ -28,5 +29,19 @@ defmodule IbanTools.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     []
+  end
+
+  defp package do
+    [
+      name: :iban_tools,
+      files: ["config", "lib", "test", "mix.exs", "README*", "LICENSE*"],
+      maintainers: ["Pikender Sharma"],
+      licenses: ["Apache 2.0"],
+      links: %{"GitHub" => "https://github.com/pikender/iban_tools",
+      "Docs" => "https://github.com/pikender/iban_tools/README"}]
+  end
+
+  defp description do
+    "Iban validation and helpers https://en.wikipedia.org/wiki/International_Bank_Account_Number"
   end
 end
