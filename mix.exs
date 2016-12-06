@@ -38,7 +38,7 @@ defmodule IbanTools.Mixfile do
       maintainers: ["Pikender Sharma"],
       licenses: ["Apache 2.0"],
       links: %{"GitHub" => "https://github.com/pikender/iban_tools",
-      "Docs" => "https://github.com/pikender/iban_tools/README"}]
+      "Docs" => "https://github.com/pikender/iban_tools/blob/master/README.md"}]
   end
 
   defp description do
