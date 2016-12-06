@@ -25,8 +25,8 @@ Refer <https://en.wikipedia.org/wiki/International_Bank_Account_Number> for more
   2. Validate Iban and get error info as per violation
 
       ```elixir
-      iex(3)> IbanTools.valid("ES12345")
-      {:error, :invalid_code_length, "Violation of Country Code length"}
+      iex(10)>  IbanTools.valid("ES8901820507910202155087")
+      {:ok, :valid, "Iban code is valid"}
       ```
 
   3. Get numerified Iban value as needed for check digit validation (modulo 97)
@@ -34,6 +34,27 @@ Refer <https://en.wikipedia.org/wiki/International_Bank_Account_Number> for more
       ```elixir
       iex(4)> "GB82 WEST 1234 5698 7654 32" |> IbanTools.iban_values |> IbanTools.Numerify.numerify
       3214282912345698765432161182
+      ```
+
+  4. Validate Modulo 97 check passes or not
+
+      ```elixir
+      iex(1)> "RO7999991B31007593840000" |> IbanTools.iban_values |> IbanTools.Numerify.check_valid_check_digits
+      :ok
+      ```
+
+  5. Get sanitised IBAN code
+
+      ```elixir
+      iex(7)> " ro7999991ı31007593840001 " |> IbanTools.canonicalize_code
+      "RO7999991I31007593840001"
+      ```
+
+  6. Pretty print IBAN code for better human readability
+
+      ```elixir
+      iex(1)> "RO7999991B31007593840001" |> IbanTools.pretty_print
+      "RO79 9999 1B31 0075 9384 0001"
       ```
 
 ### Supported Error/Message codes
@@ -70,6 +91,6 @@ Refer <https://en.wikipedia.org/wiki/International_Bank_Account_Number> for more
   ```
 
   ```elixir
-  iex(10)>  IbanTools.valid("ES8901820507910202155087")
-  {:ok, :valid, "Iban code is valid"}
+  iex(2)> "RO7999991B31007593840001" |> IbanTools.iban_values |> IbanTools.Numerify.check_valid_check_digits
+  {:error, :bad_check_digits}
   ```

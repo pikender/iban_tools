@@ -48,15 +48,15 @@ defmodule IbanToolsTest do
   end
 
   test "should extract ISO country code" do
-    assert IbanTools.country_code("ES8901820507910202155087") == "ES"
+    assert IbanTools.iban_values("ES8901820507910202155087").country_code == "ES"
   end
 
   test "should extract check digits" do
-    assert IbanTools.check_digits("ES8901820507910202155087") == "89"
+    assert IbanTools.iban_values("ES8901820507910202155087").check_digits == "89"
   end
 
   test "should extract BBAN (Basic Bank Account Number)" do
-    assert IbanTools.bban("ES8901820507910202155087") == "01820507910202155087"
+    assert IbanTools.iban_values("ES8901820507910202155087").bban == "01820507910202155087"
   end
 
   test "should fail known pattern violations" do
