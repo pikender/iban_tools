@@ -1,4 +1,4 @@
-# IbanTools
+# IbanTools [![Build Status](https://travis-ci.org/pikender/iban_tools.svg?branch=master)](https://travis-ci.org/pikender/iban_tools)
 
 Iban validation and helpers
 Refer <https://en.wikipedia.org/wiki/International_Bank_Account_Number> for more details
